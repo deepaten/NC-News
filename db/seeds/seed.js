@@ -1,6 +1,7 @@
 const db = require("../connection")
+const {convertTimestampToDate,createArticleLookup,formatComments} = require("./utils.js");
 const format = require('pg-format');
-const convert = require("./utils.js");
+
 
 
 const seed = ({ topicData, userData, articleData, commentData }) => {
@@ -78,22 +79,48 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
   .then(()=>
   {
     //formatted string for articles data
-      const formattedInsertValues = articleData.map((article)=>{
-        const timestampConverted = convert.convertTimestampToDate(article.created_at);
-        //console.log(timestampConverted,article.created_at, " >>>>AFTER CONVERTSION")
-      return [article.title, article.topic, article.author, article.body,timestampConverted, article.votes, article.article_img_url];
-    })
+      let timestampConverted;
+
+        const formattedInsertValues = articleData.map((article)=>{
+        timestampConverted = convertTimestampToDate(article);
+      return [article.title, article.topic, article.author, article.body,timestampConverted.created_at,article.article_img_url];
+      })
+
     //make a call to format with values to insert in articles
     const insertQuery = format(`INSERT INTO articles
-                      (title, topic, author, body, created_at, votes, article_img_url )
+                      (title, topic, author, body, created_at, article_img_url )
                       VALUES
                       %L
                       RETURNING *;`,
                       formattedInsertValues )
-   // return db.query(insertQuery);
+    return db.query(insertQuery);
   })
-  .then((rows)=>{
-    console.log(rows, "after article insert")
+   .then((insertedArticles)=>{
+     //formatted string for comments data
+     const articleLookup = createArticleLookup(insertedArticles.rows);
+     //create articleIdLookup- {title: articleId} from articles inserted
+
+    //create lookup function- which looks into comment test data and adds article id as new property and its idno in the array obj
+    //const newCommentData = {...commentData};
+    //call a function to find the article id using articlelookpup and add in comments data
+
+      const commentMap = formatComments(commentData,articleLookup);
+      const formattedInsertValues = commentMap.map((comment)=>{
+      const timestampConverted = convertTimestampToDate(comment);
+      return [comment.article_id,comment.body, comment.votes, comment.author, timestampConverted.created_at];
+    })
+    //make a call to format with values to insert in comments
+    const insertQuery = format(`INSERT INTO comments
+                      (article_id, body, votes, author, created_at )
+                      VALUES
+                      %L
+                      RETURNING *;`,
+                      formattedInsertValues );
+    return db.query(insertQuery);    
   })
 };
+
+
+
+
 module.exports = seed;
