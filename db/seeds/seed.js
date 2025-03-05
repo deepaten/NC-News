@@ -83,12 +83,12 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
 
         const formattedInsertValues = articleData.map((article)=>{
         timestampConverted = convertTimestampToDate(article);
-      return [article.title, article.topic, article.author, article.body,timestampConverted.created_at,article.article_img_url];
+      return [article.title, article.topic, article.author, article.body,timestampConverted.created_at,article.votes,article.article_img_url];
       })
 
     //make a call to format with values to insert in articles
     const insertQuery = format(`INSERT INTO articles
-                      (title, topic, author, body, created_at, article_img_url )
+                      (title, topic, author, body, created_at, votes,article_img_url )
                       VALUES
                       %L
                       RETURNING *;`,
