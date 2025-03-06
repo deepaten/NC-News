@@ -98,11 +98,6 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
    .then((insertedArticles)=>{
      //formatted string for comments data
      const articleLookup = createArticleLookup(insertedArticles.rows);
-     //create articleIdLookup- {title: articleId} from articles inserted
-
-    //create lookup function- which looks into comment test data and adds article id as new property and its idno in the array obj
-    //const newCommentData = {...commentData};
-    //call a function to find the article id using articlelookpup and add in comments data
 
       const commentMap = formatComments(commentData,articleLookup);
       const formattedInsertValues = commentMap.map((comment)=>{
