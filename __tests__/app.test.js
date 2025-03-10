@@ -16,6 +16,7 @@ afterAll(() => {
   return db.end();
 });
 
+
 describe("GET /api", () => {
   test("200: Responds with an object detailing the documentation for each endpoint", () => {
     return request(app)
@@ -27,4 +28,20 @@ describe("GET /api", () => {
   });
   
 });
+
+describe("GET /api/topics",()=>{
+  test("200: Responds with an array of topic objects, each having properties slug and description",()=>{
+    return request(app)
+      .get("/api/topics")
+      .expect(200)
+      .then(({body})=>{       
+        const topics = body.topics;
+        topics.forEach((topic) => {
+          expect(topic).toMatchObject({
+            slug: expect.any(String),
+            description: expect.any(String)})          
+        });
+      })
+    })
+})
 
