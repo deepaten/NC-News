@@ -36,6 +36,8 @@ describe("GET /api/topics",()=>{
       .expect(200)
       .then(({body})=>{       
         const topics = body.topics;
+        expect(topics.length).toBe(3);
+        
         topics.forEach((topic) => {
           expect(topic).toMatchObject({
             slug: expect.any(String),
@@ -43,5 +45,16 @@ describe("GET /api/topics",()=>{
         });
       })
     })
-})
+  })
 
+  //for testing invalid path
+describe("GET /api/tooopics",()=>{
+  test("404: Responds with error message",()=>{
+    return request(app)
+    .get("/api/tooopics")
+    .expect(404)
+    .then(({body})=>{
+      expect(body.msg).toBe("Path not found.")
+    })
+  })
+})
