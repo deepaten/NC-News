@@ -4,7 +4,8 @@ const request = require("supertest");
 const app = require("../app.js")
 const seed = require("../db/seeds/seed.js")
 const db = require("../db/connection.js")
-const data = require("../db/data/test-data")
+const data = require("../db/data/test-data");
+const { string } = require("pg-format");
 
 
 /* Set up your beforeEach & afterAll functions here */
@@ -47,14 +48,77 @@ describe("GET /api/topics",()=>{
     })
   })
 
-  //for testing invalid path
-describe("GET /api/tooopics",()=>{
-  test("404: Responds with error message",()=>{
+  //for testing missing endpoint
+describe("GET /api/missingendpoint",()=>{
+  test("404: Responds with error message for missing endpoint.",()=>{
     return request(app)
-    .get("/api/tooopics")
+    .get("/api/missingendpoint")
     .expect(404)
     .then(({body})=>{
       expect(body.msg).toBe("Path not found.")
     })
   })
 })
+
+describe("GET /api/articles/:article_id",()=>{
+  test("200: Responds with and article object that has author,title,article_id,body,topic,created_at,votes,article_img_url",()=>{
+    return request(app)
+    .get("/api/articles/3")
+    .expect(200)
+    .then(({body})=>{
+      const article = body.article;      
+      expect(article).toMatchObject({
+        author: expect.any(String),
+        title: expect.any(String),
+        article_id: expect.any(Number),
+        body: expect.any(String),
+        topic: expect.any(String),
+        created_at: expect.any(String),
+        votes: expect.any(Number),
+        article_img_url: expect.any(String)
+      })
+    })
+  })
+
+  test("404: Responds with articles not found for valid Id that does not exist in database.",()=>{
+    return request(app)
+    .get("/api/articles/18")
+    .expect(404)
+    .then(({body})=>{
+      expect(body.msg).toBe("Articles not found for the Id 18.")
+    })
+  })
+
+  test("400: Responds with Bad request for sending invalid data.",()=>{
+    return request(app)
+    .get("/api/articles/invalidid")
+    .expect(400)
+    .then(({body})=>{
+      expect(body.msg).toBe("Bad request sent, please send valid Article Id.")
+    })
+  })
+})
+
+/*
+  "GET /api/articles/:article_id": {
+    "description": "serves an object with article details for an article id",
+    "queries": ["author", "topic", "sort_by", "order"],
+    "exampleResponse": {
+      "article":
+        {
+            "author": "icellusedkars",
+            "title": "Eight pug gifs that remind me of mitch",
+            "article_id": 3,
+            "body": "some gifs",
+            "topic": "mitch",
+            "created_at": "2020-11-03T09:12:00.000Z",
+            "votes": 0,
+            "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+          }
+        }
+      }
+*/
+
+
+
+
