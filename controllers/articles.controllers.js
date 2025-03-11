@@ -1,5 +1,7 @@
 //const { articleData } = require("../db/data/test-data")
-const {fetchArticlesById} = require("../models/articles.models")
+const {fetchArticlesById,
+        fetchArticles} = require("../models/articles.models")
+
 
 exports.getArticlesById = (request, response, next)=>
 {
@@ -11,6 +13,15 @@ exports.getArticlesById = (request, response, next)=>
     .catch((error)=>{
         next(error)
     })
+}
 
+exports.getArticles = (request, response, next)=>{
 
+    fetchArticles()
+    .then((articles)=>{
+        response.status(200).send({articles: articles})
+    })
+    .catch((error)=>{
+        next(error)
+    })
 }
