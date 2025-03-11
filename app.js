@@ -10,13 +10,14 @@ app.get('/api', getApi);
 app.get('/api/topics',getTopics)
 
 
-app.use((error, request, response, next)=>{
-    if(error.status && error.msg) {
-        response.status(error.status)
-        .send({msg: error.msg})
-    } else {
-        next(error)
-    }
+
+app.all('/*', (request, response,next) => {
+    response.status(404)
+    .send({msg: "Path not found."})
+})
+
+app.use((req, res, err )=>{
+    response.status(500).send({msg: "Internal server error."})
 })
 
 
