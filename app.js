@@ -4,6 +4,7 @@ const endpoints = require("./endpoints.json")
 const getApi = require("./controllers/api.controllers")
 const {getTopics} = require("./controllers/topics.controllers")
 const {getArticlesById, getArticles} = require("./controllers/articles.controllers")
+const {getCommentsByArticleID} = require("./controllers/comments.controllers")
 
 
 app.get('/api', getApi);
@@ -13,6 +14,8 @@ app.get('/api/topics',getTopics)
 app.get('/api/articles/:article_id', getArticlesById)
 
 app.get('/api/articles', getArticles)
+
+app.get('/api/articles/:article_id/comments', getCommentsByArticleID)
 
 
 //end point error

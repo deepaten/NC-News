@@ -6,6 +6,7 @@ const seed = require("../db/seeds/seed.js")
 const db = require("../db/connection.js")
 const data = require("../db/data/test-data");
 const { string } = require("pg-format");
+require('jest-sorted');
 
 
 /* Set up your beforeEach & afterAll functions here */
@@ -81,6 +82,7 @@ describe("GET /api/articles/:article_id",()=>{
     })
   })
 
+
   test("404: Responds with articles not found for valid Id that does not exist in database.",()=>{
     return request(app)
     .get("/api/articles/18")
@@ -108,27 +110,71 @@ describe("GET /api/articles",()=>{
     .expect(200)
     .then(({body})=>{
       const articles = body.articles
-      //to test sort order
-       expect(articles[0].article_id).toBe(3)
-       expect(articles[0].created_at).toBe( "2020-11-03T09:12:00.000Z")
-      articles.forEach((article)=>{
+        //to test sort order
+        expect(articles).toBeSortedBy('created_at', { descending: true });
+        //to test if returns records
+        expect(articles.length).toBe(13)
+
+        articles.forEach((article)=>{
         //for checking comment count for article id
-        if (article.article_id === 5)
-        {
-          expect(article.comment_count).toBe(2);
-        }
- 
-        expect(article).toMatchObject({
-          author: expect.any(String),
-          title: expect.any(String),
-          article_id: expect.any(Number),
-          topic: expect.any(String),
-          created_at: expect.any(String),
+              if (article.article_id === 5)
+              {
+                expect(article.comment_count).toBe(2);
+              }
+      
+              expect(article).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(Number) })
+            })
+      })
+})
+})
+
+describe("GET /api/articles/:articles_id/comments",()=>{
+  test("200: Responds with all comments for an article Id with most recent comments first.",()=>{
+    return request(app)
+    .get("/api/articles/1/comments")
+    .expect(200)
+    .then(({body})=>{
+      const comments = body.comments
+      expect(comments.length).toBe(11)
+      expect(comments).toBeSortedBy('created_at', { descending: true });
+
+      comments.forEach((comment)=>{
+        expect(comment).toMatchObject({
+          comment_id: expect.any(Number),
           votes: expect.any(Number),
-          article_img_url: expect.any(String),
-          comment_count: expect.any(Number)
+          created_at: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          article_id: expect.any(Number)
+        })
       })
     })
   })
-})
+
+  test("404: Responds with comments not found for valid Id that does not exist in the database.",()=>
+  {
+    return request(app)
+    .get("/api/articles/18/comments")
+    .expect(404)
+    .then(({body})=>{
+      expect(body.msg).toBe("Comments not found for the article_id 18.")
+    })
+  })
+
+  test("400: Responds with Bad request for sending invalid data.",()=>{
+    return request(app)
+    .get("/api/articles/invalidid/comments")
+    .expect(400)
+    .then(({body})=>{
+      expect(body.msg).toBe("Bad request sent, please send valid Article Id.")
+    })
+  })
 })
