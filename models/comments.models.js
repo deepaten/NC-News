@@ -1,4 +1,5 @@
 const db = require("../db/connection")
+const convertTimestampToDate = require("../db/seeds/utils")
 
 exports.fetchCommentsByArticleID= (article_id)=>{
 
@@ -8,10 +9,26 @@ exports.fetchCommentsByArticleID= (article_id)=>{
                         ORDER BY created_at DESC`,[article_id])
                         
             .then(({rows})=>{
-                if (rows.length === 0){
-                    return Promise.reject({status: 404, msg: `Comments not found for the article_id ${article_id}.`});
-                }
                 return rows
                 
             })
+}
+
+
+exports.insertCommentsByArticleId=(article_id,username,body)=>{
+    const currentDt = new Date;
+    
+    return db.query(`INSERT INTO comments
+                (article_id, body, votes, author, created_at)
+                VALUES($1,$2,$3,$4,$5)
+                RETURNING * `,[article_id,body,0,username,currentDt])
+                .then(({rows})=>{
+                    if (rows.length === 0){
+                        return Promise.reject({status: 404, msg: `Comments not inserted in the table for the article_id ${article_id}.`});
+                    }                    
+                    return rows[0];
+                })
+
+
+    
 }
