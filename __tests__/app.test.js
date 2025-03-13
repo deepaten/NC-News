@@ -246,3 +246,20 @@ describe("POST /api/articles/:articles_id/comments",()=>{
   })
 
 })
+
+/*
+"POST /api/articles/:article_id/comments": {
+    "description": "Adds add a comment for an article and responds with the posted comment",
+    "exampleResponse": {
+      "comment":
+         {
+          "article_id": 1,
+          "body": "The beautiful thing about treasure is that it exists.",
+          "votes": 0,
+          "comment_id": 19,
+          "author": "butter_bridge",
+          "created_at": "2025-03-13T03:03:00.000Z"
+        }
+        }
+      },
+*/
