@@ -147,6 +147,7 @@ describe("GET /api/articles/:articles_id/comments",()=>{
       expect(comments).toBeSortedBy('created_at', { descending: true });
 
       comments.forEach((comment)=>{
+        expect(comment.article_id).toBe(1)
         expect(comment).toMatchObject({
           comment_id: expect.any(Number),
           votes: expect.any(Number),
@@ -168,6 +169,15 @@ describe("GET /api/articles/:articles_id/comments",()=>{
       expect(body.msg).toBe("Comments not found for the article_id 18.")
     })
   })
+  test("200: Responds with an empty array if article Id exists but have no comments.",()=>
+    {
+      return request(app)
+      .get("/api/articles/13/comments")
+      .expect(200)
+      .then(({body})=>{
+        expect(body.comments).toEqual([])
+      })
+    })
 
   test("400: Responds with Bad request for sending invalid data.",()=>{
     return request(app)
@@ -177,4 +187,62 @@ describe("GET /api/articles/:articles_id/comments",()=>{
       expect(body.msg).toBe("Bad request sent, please send valid Article Id.")
     })
   })
+})
+
+describe("POST /api/articles/:articles_id/comments",()=>{
+  test("200: Responds with comments posted in the database",()=>{
+    const postReq = {
+      username:"rogersop", 
+      body: "I am learning post request!"
+    }
+    return request(app)
+    .post("/api/articles/5/comments")
+        //username: "rogersop", body: "I am learning post request!"}
+    .send(postReq)
+    .expect(200)
+    .then(({body})=>{
+      const comment = body.comment;
+      expect(comment.article_id).toBe(5)
+      expect(comment.comment_id).toBe(19)
+      expect(comment.author).toBe(postReq.username)
+      expect(comment.body).toBe(postReq.body)
+      
+      expect(comment).toMatchObject({
+        article_id: expect.any(Number),
+        body: expect.any(String),
+        votes: expect.any(Number),   
+        comment_id: expect.any(Number),     
+        author: expect.any(String),
+        created_at: expect.any(String),
+      })
+    })
+  })
+
+  test("404: Responds with article id does not exist", ()=>{
+      const postReq = {
+      username:"rogersop", 
+      body: "I am learning post request!"
+    }
+    return request(app)
+    .post("/api/articles/18/comments")
+        //username: "rogersop", body: "I am learning post request!"}
+    .send(postReq)
+    .expect(404)
+    .then(({body})=>{
+      expect(body.msg).toBe("Foreign key violation, no records exist for article_id.")
+    })
+  })
+
+  test("400: Responds with message Bad request if an empty object sent for te post request.",()=>{
+    const postReq = { }
+    return request(app)
+    .post("/api/articles/13/comments")
+        //username: "rogersop", body: "I am learning post request!"}
+    .send(postReq)
+    .expect(400)
+    .then(({body})=>{
+      expect(body.msg).toBe("Bad request sent with no details.")
+    })
+  })
+
 })

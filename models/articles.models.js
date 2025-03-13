@@ -14,6 +14,17 @@ exports.fetchArticlesById= (articleId)=>{
                     })
 }
 
+exports.checkArticleIdExists=(article_id)=>
+    {
+        return db.query(`SELECT * FROM articles
+                WHERE article_id = $1`,[article_id])
+                .then(({rows})=>{
+                    if (rows.length === 0){                        
+                          return Promise.reject({status: 404, msg: `Comments not found for the article_id ${article_id}.`});
+                    }
+                })
+    }
+
 exports.fetchArticles= () => {
 
     return db.query(`SELECT articles.author, articles.title, articles.article_id, 
