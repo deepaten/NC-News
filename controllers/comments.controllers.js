@@ -39,7 +39,7 @@ exports.postCommentsByArticleId = (request, response,next)=>{
         .then((resolvedpromises)=>{
             response.status(200).send({comment: resolvedpromises[0]})
         })
-        .catch((error)=>{            
+        .catch((error)=>{  
             next(error)
         })
 

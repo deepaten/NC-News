@@ -196,8 +196,7 @@ describe("POST /api/articles/:articles_id/comments",()=>{
       body: "I am learning post request!"
     }
     return request(app)
-    .post("/api/articles/5/comments")
-        //username: "rogersop", body: "I am learning post request!"}
+    .post("/api/articles/5/comments")        
     .send(postReq)
     .expect(200)
     .then(({body})=>{
@@ -225,11 +224,25 @@ describe("POST /api/articles/:articles_id/comments",()=>{
     }
     return request(app)
     .post("/api/articles/18/comments")
-        //username: "rogersop", body: "I am learning post request!"}
+        
     .send(postReq)
     .expect(404)
     .then(({body})=>{
-      expect(body.msg).toBe("Foreign key violation, no records exist for article_id.")
+      expect(body.msg).toBe("Key (article_id)=(18) is not present in table \"articles\".")
+    })
+  })
+
+  test("404: Responds with username does not exist in the database.",()=>{
+    const postReq = {
+      username:"rogerso", 
+      body: "I am learning post request!"
+    }
+    return request(app)
+    .post("/api/articles/5/comments")
+    .send(postReq)
+    .expect(404)
+    .then(({body})=>{
+      expect(body.msg).toBe("Key (author)=(rogerso) is not present in table \"users\".")
     })
   })
 
@@ -237,7 +250,6 @@ describe("POST /api/articles/:articles_id/comments",()=>{
     const postReq = { }
     return request(app)
     .post("/api/articles/13/comments")
-        //username: "rogersop", body: "I am learning post request!"}
     .send(postReq)
     .expect(400)
     .then(({body})=>{
@@ -246,3 +258,86 @@ describe("POST /api/articles/:articles_id/comments",()=>{
   })
 
 })
+
+describe("PATCH /api/articles/:article_id",()=>{
+  test("200: Responds with article updated with positive votes number sent.",()=>{
+    const patchReq = {inc_votes: 40}
+    return request(app)
+    .patch("/api/articles/1")
+    .send(patchReq)
+    .expect(200)
+    .then(({body})=>{
+        const article = body.article
+        expect(article.article_id).toBe(1)
+        expect(article.votes).toBe(140)
+
+        expect(article).toMatchObject({
+          author: expect.any(String),
+          title: expect.any(String),
+          article_id: expect.any(Number),
+          body: expect.any(String),
+          topic: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String)
+          })
+    })
+  })
+
+  test("200: Responds with article updated with negative votes number sent.",()=>{
+    const patchReq = {inc_votes: -20}
+    return request(app)
+    .patch("/api/articles/1")
+    .send(patchReq)
+    .expect(200)
+    .then(({body})=>{
+        const article = body.article
+        expect(article.article_id).toBe(1)
+        expect(article.votes).toBe(80)
+
+        expect(article).toMatchObject({
+          author: expect.any(String),
+          title: expect.any(String),
+          article_id: expect.any(Number),
+          body: expect.any(String),
+          topic: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String)
+          })
+    })
+  })
+
+  test("404: Responds with article_id does not exist if article_id is not in the table",()=>{
+    const patchReq = {inc_votes: 40}
+    return request(app)
+    .patch("/api/articles/18")
+    .send(patchReq)
+    .expect(404)
+    .then(({body})=>{
+      expect(body.msg).toBe("Votes could not be updated for article_id 18, article_id does not exist.")
+    })
+  })
+
+  test("400: Responds with bad request sent if incorrect data sents.",()=>{
+    const patchReq = {inc_votes: "fun"}
+    return request(app)
+    .patch("/api/articles/1")
+    .send(patchReq)
+    .expect(400)
+    .then(({body})=>{
+      expect(body.msg).toBe("Bad request sent with either No details or incorrect details.")
+    })
+  })
+
+  test("400: Responds with bad request sent if an empty object of details sent.",()=>{
+    const patchReq = {}
+    return request(app)
+    .patch("/api/articles/1")
+    .send(patchReq)
+    .expect(400)
+    .then(({body})=>{
+      expect(body.msg).toBe("Bad request sent with either No details or incorrect details.")
+    })
+  })
+} )
