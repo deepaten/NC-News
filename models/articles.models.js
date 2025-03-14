@@ -20,8 +20,9 @@ exports.checkArticleIdExists=(article_id)=>
                 WHERE article_id = $1`,[article_id])
                 .then(({rows})=>{
                     if (rows.length === 0){                        
-                          return Promise.reject({status: 404, msg: `Comments not found for the article_id ${article_id}.`});
+                          return Promise.reject({status: 404, msg: `Article_id does not exist.`});
                     }
+                    return rows;
                 })
     }
 

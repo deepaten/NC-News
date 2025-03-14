@@ -97,7 +97,7 @@ describe("GET /api/articles/:article_id",()=>{
     .get("/api/articles/invalidid")
     .expect(400)
     .then(({body})=>{
-      expect(body.msg).toBe("Bad request sent, please send valid Article Id.")
+      expect(body.msg).toBe("Bad request sent.")
     })
   })
 })
@@ -160,13 +160,13 @@ describe("GET /api/articles/:articles_id/comments",()=>{
     })
   })
 
-  test("404: Responds with comments not found for valid Id that does not exist in the database.",()=>
+  test("404: Responds with article Id does not exist in the database.",()=>
   {
     return request(app)
     .get("/api/articles/18/comments")
     .expect(404)
     .then(({body})=>{
-      expect(body.msg).toBe("Comments not found for the article_id 18.")
+      expect(body.msg).toBe("Article_id does not exist.")
     })
   })
   test("200: Responds with an empty array if article Id exists but have no comments.",()=>
@@ -184,7 +184,7 @@ describe("GET /api/articles/:articles_id/comments",()=>{
     .get("/api/articles/invalidid/comments")
     .expect(400)
     .then(({body})=>{
-      expect(body.msg).toBe("Bad request sent, please send valid Article Id.")
+      expect(body.msg).toBe("Bad request sent.")
     })
   })
 })
@@ -228,7 +228,10 @@ describe("POST /api/articles/:articles_id/comments",()=>{
     .send(postReq)
     .expect(404)
     .then(({body})=>{
-      expect(body.msg).toBe("Key (article_id)=(18) is not present in table \"articles\".")
+    
+      expect(body.msg).toBe("Article_id does not exist.")
+      
+      //
     })
   })
 
@@ -319,6 +322,17 @@ describe("PATCH /api/articles/:article_id",()=>{
     })
   })
 
+  test("400: Responds with invalid article id sent.",()=>{
+    const patchReq = {inc_votes: 40}
+    return request(app)
+    .patch("/api/articles/wrongtype")
+    .send(patchReq)
+    .expect(400)
+    .then(({body})=>{
+      expect(body.msg).toBe("Invalid article_id sent.")
+    })
+  })
+
   test("400: Responds with bad request sent if incorrect data sents.",()=>{
     const patchReq = {inc_votes: "fun"}
     return request(app)
@@ -341,3 +355,33 @@ describe("PATCH /api/articles/:article_id",()=>{
     })
   })
 } )
+
+describe("DELETE /api/comments/:comment_id",()=>{
+  test("204: Responds with no content, deletes the given comment for the comment_id",()=>{
+
+    return request(app)
+    .delete("/api/comments/17")
+    .expect(204)
+    .then(({body})=>{
+      expect(body).toEqual({})
+    })
+  })
+
+  test("404: Responds with Not found error message for comment_id that does not exist.",()=>{
+    return request(app)
+    .delete("/api/comments/25")
+    .expect(404)
+    .then(({body})=>{
+      expect(body.msg).toBe("Comment_id not found.")
+    })
+  })
+
+  test("400: Responds with Bad request error message for invalid comment_id.",()=>{
+    return request(app)
+    .delete("/api/comments/notid")
+    .expect(400)
+    .then(({body})=>{
+      expect(body.msg).toBe("Bad request sent.")
+    })
+  })
+})

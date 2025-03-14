@@ -4,7 +4,7 @@ const endpoints = require("./endpoints.json")
 const getApi = require("./controllers/api.controllers")
 const {getTopics} = require("./controllers/topics.controllers")
 const {getArticlesById, getArticles, patchArticlesById} = require("./controllers/articles.controllers")
-const {getCommentsByArticleID, postCommentsByArticleId} = require("./controllers/comments.controllers")
+const {getCommentsByArticleID, postCommentsByArticleId, deleteCommentById} = require("./controllers/comments.controllers")
 
 
 app.get('/api', getApi);
@@ -23,6 +23,7 @@ app.post('/api/articles/:article_id/comments', postCommentsByArticleId)
 
 app.patch('/api/articles/:article_id',patchArticlesById)
 
+app.delete('/api/comments/:comment_id',deleteCommentById)
 
 //end point error
 app.all('/*', (request, response,next) => {
@@ -44,7 +45,7 @@ app.use((error, request, response, next)=>{
     
     if(error.code === "22P02") {
         response.status(400)
-        .send({msg: "Bad request sent, please send valid Article Id."})
+        .send({msg: "Bad request sent."})
     }
 
     if (error.code === "23503")
