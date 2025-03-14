@@ -5,6 +5,7 @@ const getApi = require("./controllers/api.controllers")
 const {getTopics} = require("./controllers/topics.controllers")
 const {getArticlesById, getArticles, patchArticlesById} = require("./controllers/articles.controllers")
 const {getCommentsByArticleID, postCommentsByArticleId, deleteCommentById} = require("./controllers/comments.controllers")
+const {getUsers} = require("./controllers/users.controllers")
 
 
 app.get('/api', getApi);
@@ -24,6 +25,8 @@ app.post('/api/articles/:article_id/comments', postCommentsByArticleId)
 app.patch('/api/articles/:article_id',patchArticlesById)
 
 app.delete('/api/comments/:comment_id',deleteCommentById)
+
+app.get('/api/users',getUsers)
 
 //end point error
 app.all('/*', (request, response,next) => {
