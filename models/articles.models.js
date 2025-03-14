@@ -44,3 +44,15 @@ exports.fetchArticles= () => {
                 return rows;
             })
 }
+
+exports.updateArticlesById = (article_id,nVotes) =>{
+  
+    return db.query(`UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING * `,[nVotes, article_id])
+                .then(({rows})=>{
+                    if ( rows.length === 0)
+                    {                     
+                        return Promise.reject({status: 404, msg: `Votes could not be updated for article_id ${article_id}, article_id does not exist.`})
+                    }
+                    return rows[0];
+                })
+}

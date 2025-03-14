@@ -3,7 +3,7 @@ const app = express();
 const endpoints = require("./endpoints.json")
 const getApi = require("./controllers/api.controllers")
 const {getTopics} = require("./controllers/topics.controllers")
-const {getArticlesById, getArticles} = require("./controllers/articles.controllers")
+const {getArticlesById, getArticles, patchArticlesById} = require("./controllers/articles.controllers")
 const {getCommentsByArticleID, postCommentsByArticleId} = require("./controllers/comments.controllers")
 
 
@@ -20,6 +20,8 @@ app.get('/api/articles/:article_id/comments', getCommentsByArticleID)
 app.use(express.json());
 
 app.post('/api/articles/:article_id/comments', postCommentsByArticleId)
+
+app.patch('/api/articles/:article_id',patchArticlesById)
 
 
 //end point error
@@ -48,7 +50,7 @@ app.use((error, request, response, next)=>{
     if (error.code === "23503")
     {
         response.status(404)
-        .send({msg: `Foreign key violation, no records exist for article_id.`})
+        .send({msg: error.detail})
     }
 })
 
