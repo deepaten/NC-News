@@ -404,3 +404,22 @@ describe("GET /api/users",()=>{
   })
 
 })
+
+/*describe("GET /api/articles?sort_by=?order=",()=>{
+  test("200: Responds with articles array of objects with comments counts sorted on topic in ascending order.",()=>{
+    return request(app)
+    .get("/api/articles?sort_by=topic?order=asc")
+    .expect(200)
+    .then(({body})=>{
+
+      const articles = body.articles
+      //to test sort order
+      expect(articles).toBeSortedBy('topic');
+      //to test if returns records
+     // expect(articles.length).toBe(13)
+
+
+    })
+
+  })
+})*/
