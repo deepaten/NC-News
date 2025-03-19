@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const endpoints = require("./endpoints.json")
 const getApi = require("./controllers/api.controllers")
 const {getTopics} = require("./controllers/topics.controllers")
 const {getArticlesById, getArticles, patchArticlesById} = require("./controllers/articles.controllers")

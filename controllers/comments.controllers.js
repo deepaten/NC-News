@@ -4,8 +4,7 @@ const app = express();
 const {fetchCommentsByArticleID, insertCommentsByArticleId,
     removeCommentById} = require("../models/comments.models")
 const {checkArticleIdExists} = require("../models/articles.models");
-const comments = require("../db/data/test-data/comments");
-const { errorMonitor } = require("supertest/lib/test");
+
 
 
 
